@@ -1,4 +1,5 @@
 const express = require('express');
+const morgan = require('morgan');
 const path = require('path');
 
 const app = express();
@@ -7,7 +8,7 @@ app.set('view engine', 'ejs');
 
 const PORT = 3000;
 
-const createPath = (name) => path.resolve(__dirname, 'ejs', `${name}.ejs`);
+const createPath = (name) => path.resolve(__dirname, 'ejs-views', `${name}.ejs`);
 
 app.listen(PORT, (err) => {
   if (err) return console.log('Error: ', err);
@@ -15,8 +16,12 @@ app.listen(PORT, (err) => {
   return console.log(`Server listening: http://localhost:${PORT}`);
 });
 
+app.use(express.static('styles'));
+app.use(morgan(':method :url :status :res[content-length] - :response-time ms'));
+
 app.get('/', (req, res) => {
-  const title = 'Home'
+  const title = 'Home';
+
   res.render(createPath('index'), { title });
 });
 
