@@ -17,7 +17,8 @@ app.listen(PORT, (err) => {
 });
 
 app.use(express.static('styles'));
-app.use(morgan(':method :url :status :res[content-length] - :response-time ms'));
+app.use(express.urlencoded({ extended: false }));
+app.use(morgan(':date[web] :method :url :status :res[content-length] - :response-time ms'));
 
 app.get('/', (req, res) => {
   const title = 'Home';
@@ -42,20 +43,52 @@ app.get('/about-us', (req, res) => {
 
 app.get('/posts/:id', (req, res) => {
   const title = 'Post';
+  const post = {
+    id: 1,
+    date: '05.05.2021',
+    author: 'Yauhen',
+    title: 'Post Title',
+    content: `<p>
+        Lorem ipsum dolor sit amet consectetur adipisicing elit. Sapiente quidem provident, dolores, vero laboriosam nemo mollitia impedit unde fugit sint eveniet, minima odio ipsum sed recusandae aut iste aspernatur dolorem.
+      </p><p>
+        Lorem ipsum dolor sit amet consectetur adipisicing elit. Sapiente quidem provident, dolores, vero laboriosam nemo mollitia impedit unde fugit sint eveniet, minima odio ipsum sed recusandae aut iste aspernatur dolorem.
+        Lorem ipsum dolor sit amet consectetur adipisicing elit. Sapiente quidem provident, dolores, vero laboriosam nemo mollitia impedit unde fugit sint eveniet, minima odio ipsum sed recusandae aut iste aspernatur dolorem.
+        Lorem ipsum dolor sit amet consectetur adipisicing elit. Sapiente quidem provident, dolores, vero laboriosam nemo mollitia impedit unde fugit sint eveniet, minima odio ipsum sed recusandae aut iste aspernatur dolorem.
+      </p>`,
+  };
 
-  res.render(createPath('post'), { title });
+  res.render(createPath('post'), { title, post });
 });
 
 app.get('/posts', (req, res) => {
-  const title = 'Post list';
+  const list = [{
+    id: 1,
+    date: '05.05.2021',
+    author: 'Yauhen',
+    title: 'Post Title',
+    excerpt: 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Sapiente quidem provident, dolores, vero laboriosam nemo mollitia impedit unde fugit sint eveniet, minima odio ipsum sed recusandae aut iste aspernatur dolorem.',
+  }];
 
-  res.render(createPath('posts'), { title });
+  res.render(createPath('posts'), { title: list.title, list });
 });
 
 app.get('/add-post', (req, res) => {
   const title = 'New post';
 
   res.render(createPath('add-post'), { title });
+});
+
+app.post('/add-post', (req, res) => {
+  const { title, author, content } = req.body;
+  const post = {
+    id: Date.now(),
+    date: (new Date()).toLocaleDateString('ru'),
+    title,
+    author,
+    content,
+  };
+
+  res.render(createPath('post'), { title, post });
 });
 
 app.use((req, res) => {
