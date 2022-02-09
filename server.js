@@ -1,12 +1,20 @@
 const express = require('express');
 const morgan = require('morgan');
+const mongoose = require('mongoose');
 const path = require('path');
+const Post = require('./models/post');
 
 const app = express();
 
 app.set('view engine', 'ejs');
 
 const PORT = 3000;
+const db = 'mongodb+srv://vovaborisenko:Kolcevaya53@cluster0.ovkt9.mongodb.net/node-blog?retryWrites=true&w=majority';
+
+mongoose
+  .connect(db)
+  .then(() => console.log('DB connection established'))
+  .catch((error) => console.log(error));
 
 const createPath = (name) => path.resolve(__dirname, 'ejs-views', `${name}.ejs`);
 
@@ -79,16 +87,22 @@ app.get('/add-post', (req, res) => {
 });
 
 app.post('/add-post', (req, res) => {
-  const { title, author, content } = req.body;
-  const post = {
-    id: Date.now(),
-    date: (new Date()).toLocaleDateString('ru'),
-    title,
-    author,
-    content,
-  };
+  const {
+    title, author, content, excerpt,
+  } = req.body;
+  const post = new Post({
+    title, author, content, excerpt,
+  });
 
-  res.render(createPath('post'), { title, post });
+  post
+    .save()
+    .then((result) => res.send(result))
+    .catch((error) => {
+      console.log(error.message);
+      res
+        .status(400)
+        .send(error.message);
+    });
 });
 
 app.use((req, res) => {
