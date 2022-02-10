@@ -3,6 +3,7 @@ const morgan = require('morgan');
 const mongoose = require('mongoose');
 const path = require('path');
 const Post = require('./models/post');
+const Contact = require('./models/contact');
 
 const app = express();
 
@@ -36,13 +37,16 @@ app.get('/', (req, res) => {
 
 app.get('/contacts', (req, res) => {
   const title = 'Contacts';
-  const contacts = [
-    { link: 'http://youtube.com/YauhenKavalchuk', label: 'YouTube' },
-    { link: 'http://github.com/YauhenKavalchuk', label: 'Twitter' },
-    { link: 'http://twitter.com/YauhenKavalchuk', label: 'GitHub' },
-  ];
 
-  res.render(createPath('contacts'), { contacts, title });
+  Contact
+    .find()
+    .then((contacts) => res.render(createPath('contacts'), { contacts, title }))
+    .catch((error) => {
+      console.log(error.message);
+      res
+        .status(400)
+        .send(error.message);
+    });
 });
 
 app.get('/about-us', (req, res) => {
@@ -51,33 +55,31 @@ app.get('/about-us', (req, res) => {
 
 app.get('/posts/:id', (req, res) => {
   const title = 'Post';
-  const post = {
-    id: 1,
-    date: '05.05.2021',
-    author: 'Yauhen',
-    title: 'Post Title',
-    content: `<p>
-        Lorem ipsum dolor sit amet consectetur adipisicing elit. Sapiente quidem provident, dolores, vero laboriosam nemo mollitia impedit unde fugit sint eveniet, minima odio ipsum sed recusandae aut iste aspernatur dolorem.
-      </p><p>
-        Lorem ipsum dolor sit amet consectetur adipisicing elit. Sapiente quidem provident, dolores, vero laboriosam nemo mollitia impedit unde fugit sint eveniet, minima odio ipsum sed recusandae aut iste aspernatur dolorem.
-        Lorem ipsum dolor sit amet consectetur adipisicing elit. Sapiente quidem provident, dolores, vero laboriosam nemo mollitia impedit unde fugit sint eveniet, minima odio ipsum sed recusandae aut iste aspernatur dolorem.
-        Lorem ipsum dolor sit amet consectetur adipisicing elit. Sapiente quidem provident, dolores, vero laboriosam nemo mollitia impedit unde fugit sint eveniet, minima odio ipsum sed recusandae aut iste aspernatur dolorem.
-      </p>`,
-  };
 
-  res.render(createPath('post'), { title, post });
+  Post
+    .findById(req.params.id)
+    .then((post) => res.render(createPath('post'), { title, post }))
+    .catch((error) => {
+      console.log(error.message);
+      res
+        .status(400)
+        .send(error.message);
+    });
 });
 
 app.get('/posts', (req, res) => {
-  const list = [{
-    id: 1,
-    date: '05.05.2021',
-    author: 'Yauhen',
-    title: 'Post Title',
-    excerpt: 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Sapiente quidem provident, dolores, vero laboriosam nemo mollitia impedit unde fugit sint eveniet, minima odio ipsum sed recusandae aut iste aspernatur dolorem.',
-  }];
+  const title = 'Posts';
 
-  res.render(createPath('posts'), { title: list.title, list });
+  Post
+    .find()
+    .sort({ createdAt: -1 })
+    .then((list) => res.render(createPath('posts'), { title, list }))
+    .catch((error) => {
+      console.log(error.message);
+      res
+        .status(400)
+        .send(error.message);
+    });
 });
 
 app.get('/add-post', (req, res) => {
@@ -91,12 +93,12 @@ app.post('/add-post', (req, res) => {
     title, author, content, excerpt,
   } = req.body;
   const post = new Post({
-    title, author, content, excerpt,
+    title, author, content, excerpt: excerpt || content.replace(/<.+?>/, '').slice(0, 200),
   });
 
   post
     .save()
-    .then((result) => res.send(result))
+    .then(() => res.redirect('/posts'))
     .catch((error) => {
       console.log(error.message);
       res
