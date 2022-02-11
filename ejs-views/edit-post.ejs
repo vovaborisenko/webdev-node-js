@@ -3,24 +3,24 @@
 <%- include('./partials/head'); %>
 <body>
   <%- include('./partials/nav'); %>
-  <h1>Create a new Post</h1>
-  <form id="contact-form" method="post" action="/add-post">
+  <h1>Edit Post</h1>
+  <form id="contact-form" method="post" action="/posts/<%= post.id %>?_method=PUT">
     <div class="form-info">
       <label>Post Title
-        <input type="text" name="title">
+        <input type="text" name="title" value="<%= post.title %>">
       </label>
       <label>Author
-        <input type="text" name="author">
+        <input type="text" name="author" value="<%= post.author %>">
       </label>
     </div>
     <div class="form-text">
       <label>Post Excerpt
-        <textarea name="excerpt"></textarea>
+        <textarea name="excerpt"><%= post.excerpt %></textarea>
       </label>
     </div>
     <div class="form-text">
       <label>Post Text (HTML)
-        <textarea name="content"></textarea>
+        <textarea name="content"><%= post.content %></textarea>
       </label>
     </div>
     <div class="form-button">

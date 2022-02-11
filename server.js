@@ -1,6 +1,7 @@
 const express = require('express');
 const morgan = require('morgan');
 const mongoose = require('mongoose');
+const methodOverride = require('method-override');
 const path = require('path');
 const Post = require('./models/post');
 const Contact = require('./models/contact');
@@ -27,6 +28,7 @@ app.listen(PORT, (err) => {
 
 app.use(express.static('styles'));
 app.use(express.urlencoded({ extended: false }));
+app.use(methodOverride('_method'));
 app.use(morgan(':date[web] :method :url :status :res[content-length] - :response-time ms'));
 
 app.get('/', (req, res) => {
@@ -62,6 +64,53 @@ app.get('/posts/:id', (req, res) => {
     .catch((error) => {
       console.log(error.message);
       res
+        .status(404)
+        .render(createPath('error'), { title });
+    });
+});
+
+app.put('/posts/:id', (req, res) => {
+  const {
+    title, author, content, excerpt,
+  } = req.body;
+  const { id } = req.params;
+
+  Post
+    .findByIdAndUpdate(id, {
+      title, author, content, excerpt: excerpt || content.replace(/<.+?>/, '').slice(0, 200),
+    })
+    .then(() => res.redirect(`/posts/${id}`))
+    .catch((error) => {
+      console.log(error.message);
+      res
+        .status(400)
+        .send(error.message);
+    });
+});
+
+app.delete('/posts/:id', (req, res) => {
+  const { id } = req.params;
+
+  Post
+    .findByIdAndDelete(id)
+    .then((result) => res.send(result))
+    .catch((error) => {
+      console.log(error.message);
+      res
+        .status(400)
+        .send(error.message);
+    });
+});
+
+app.get('/edit-post/:id', (req, res) => {
+  const title = 'Edit Post';
+
+  Post
+    .findById(req.params.id)
+    .then((post) => res.render(createPath('edit-post'), { title, post }))
+    .catch((error) => {
+      console.log(error.message);
+      res
         .status(400)
         .send(error.message);
     });
@@ -83,7 +132,7 @@ app.get('/posts', (req, res) => {
 });
 
 app.get('/add-post', (req, res) => {
-  const title = 'New post';
+  const title = 'New Post';
 
   res.render(createPath('add-post'), { title });
 });

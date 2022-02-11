@@ -7,9 +7,38 @@
     <div class="info">
       <span><%= post.createdAt.toLocaleDateString('ru') %></span>
       <span><%= post.author %></span>
+
+      <a href="/edit-post/<%= post.id %>" class="btn" title="Edit post">
+        <i class="fas fa-edit"></i>
+      </a>
+      <button class="btn js-delete" title="Delete post">
+        <i class="fas fa-trash-alt"></i>
+      </button>
     </div>
     <h1><%= post.title %></h1>
     <%- post.content %>
   </article>
+
+  <script>
+    (function (id, title) {
+      document.querySelector('.js-delete').addEventListener('click', function () {
+        if (!confirm(`Are you sure you want to delete post: "${title}"`)) return;
+
+        fetch(`/posts/${id}`, { method: 'DELETE' })
+          .then((result) => result.json())
+          .then((data) => {
+            if (data.status === 'ERROR') {
+              throw new Error(data.message);
+            }
+
+            window.location.href = '/posts';
+          })
+          .catch((error) => {
+            alert(error.message);
+            console.error(error.message)
+          });
+      });
+    })('<%= post.id %>', '<%= post.title %>')
+  </script>
 </body>
 </html>
