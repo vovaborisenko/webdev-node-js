@@ -8,7 +8,7 @@
   <ul>
     <% list.forEach(({id, title, excerpt, createdAt, author}) => { %>
       <li>
-        <article>
+        <article class="js-post" data-id="<%= id %>" data-title="<%= title %>">
           <h2>
             <a href="/posts/<%= id %>"><%= title %></a>
           </h2>
@@ -16,11 +16,45 @@
           <div class="info">
             <span><%= createdAt.toLocaleDateString('ru') %></span>
             <span><%= author %></span>
+
+            <button class="btn js-delete" title="Delete post">
+              <i class="fas fa-trash-alt js-delete"></i>
+            </button>
           </div>
         </article>
       </li>
     <% }) %>
   </ul>
   <% } %>
+
+  <script>
+    (function () {
+      document.addEventListener('click', function (event) {
+        const target = event.target;
+
+        if (target.classList.contains('js-delete')){
+          const article = target.closest('.js-post');
+          const { id, title } = article.dataset;
+
+          if (!confirm(`Are you sure you want to delete post: "${title}"`)) return;
+
+          fetch(`/posts/${id}`, { method: 'DELETE' })
+            .then((result) => result.json())
+            .then((data) => {
+              if (data.status === 'ERROR') {
+                throw new Error(data.message);
+              }
+
+              article.remove();
+              alert('Post deleted successfully');
+            })
+            .catch((error) => {
+              alert(error.message);
+              console.error(error.message)
+            });
+        }
+      })
+    })()
+  </script>
 </body>
 </html>
