@@ -1,6 +1,8 @@
 const express = require('express');
 const morgan = require('morgan');
 const mongoose = require('mongoose');
+const chalk = require('chalk');
+require('dotenv').config();
 const methodOverride = require('method-override');
 const postRouter = require('./routes/post-routes');
 const contactRouter = require('./routes/contact-routes');
@@ -11,18 +13,20 @@ const app = express();
 
 app.set('view engine', 'ejs');
 
-const PORT = 3000;
-const db = 'mongodb+srv://vovaborisenko:Kolcevaya53@cluster0.ovkt9.mongodb.net/node-blog?retryWrites=true&w=majority';
+const PORT = process.env.PORT || 3000;
+const db = process.env.MONGODB_URL;
+const infoLog = (...args) => console.log(chalk.magenta(...args));
+const errorLog = (...args) => console.log(chalk.redBright(...args));
 
 mongoose
   .connect(db)
-  .then(() => console.log('DB connection established'))
-  .catch((error) => console.log(error));
+  .then(() => infoLog('DB connection established'))
+  .catch((error) => errorLog('Error:', error));
 
 app.listen(PORT, (err) => {
-  if (err) return console.log('Error: ', err);
+  if (err) return errorLog('Error: ', err);
 
-  return console.log(`Server listening: http://localhost:${PORT}`);
+  return infoLog(`Server listening: http://localhost:${PORT}`);
 });
 
 app.use(express.static('styles'));
@@ -38,7 +42,6 @@ app.get('/', (req, res) => {
 
 app.use(postRouter);
 app.use(contactRouter);
-
 app.use('/api', apiPostRouter);
 
 app.use((req, res) => {
