@@ -7,4 +7,11 @@ const errorHandler = (res, error) => {
     .render(createPath('error'), { title: 'Error' });
 };
 
-module.exports = errorHandler;
+const apiErrorHandler = (res, { message }) => {
+  console.log(message);
+  res
+    .status(400)
+    .send({ status: 'ERROR', message });
+};
+
+module.exports = { errorHandler, apiErrorHandler };

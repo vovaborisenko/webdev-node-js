@@ -24,7 +24,7 @@
       document.querySelector('.js-delete').addEventListener('click', function () {
         if (!confirm(`Are you sure you want to delete post: "${title}"`)) return;
 
-        fetch(`/posts/${id}`, { method: 'DELETE' })
+        fetch(`/api/post/${id}`, { method: 'DELETE' })
           .then((result) => result.json())
           .then((data) => {
             if (data.status === 'ERROR') {

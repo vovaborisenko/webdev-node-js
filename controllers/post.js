@@ -1,6 +1,6 @@
 const Post = require('../models/post');
 const createPath = require('../helpers/create-path');
-const errorHandler = require('../helpers/error-handler');
+const { errorHandler } = require('../helpers/error-handler');
 
 const renderPost = (req, res) => {
   const title = 'Post';
@@ -16,7 +16,7 @@ const createPost = (req, res) => {
     title, author, content, excerpt,
   } = req.body;
   const post = new Post({
-    title, author, content, excerpt: excerpt || content.replace(/<.+?>/, '').slice(0, 200),
+    title, author, content, excerpt,
   });
 
   post
@@ -33,7 +33,7 @@ const updatePost = (req, res) => {
 
   Post
     .findByIdAndUpdate(id, {
-      title, author, content, excerpt: excerpt || content.replace(/<.+?>/, '').slice(0, 200),
+      title, author, content, excerpt,
     })
     .then(() => res.redirect(`/posts/${id}`))
     .catch((error) => errorHandler(res, error));

@@ -12,7 +12,7 @@
           <h2>
             <a href="/posts/<%= id %>"><%= title %></a>
           </h2>
-          <p><%= excerpt %></p>
+          <p><%= excerpt || content.replace(/<.+?>/, '').slice(0, 200) %></p>
           <div class="info">
             <span><%= createdAt.toLocaleDateString('ru') %></span>
             <span><%= author %></span>
@@ -38,7 +38,7 @@
 
           if (!confirm(`Are you sure you want to delete post: "${title}"`)) return;
 
-          fetch(`/posts/${id}`, { method: 'DELETE' })
+          fetch(`/api/post/${id}`, { method: 'DELETE' })
             .then((result) => result.json())
             .then((data) => {
               if (data.status === 'ERROR') {

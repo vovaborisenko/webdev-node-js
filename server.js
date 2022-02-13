@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 const methodOverride = require('method-override');
 const postRouter = require('./routes/post-routes');
 const contactRouter = require('./routes/contact-routes');
+const apiPostRouter = require('./routes/api-post-routes');
 const createPath = require('./helpers/create-path');
 
 const app = express();
@@ -37,6 +38,8 @@ app.get('/', (req, res) => {
 
 app.use(postRouter);
 app.use(contactRouter);
+
+app.use('/api', apiPostRouter);
 
 app.use((req, res) => {
   const title = 'Oops! Error';
