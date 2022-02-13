@@ -1,6 +1,6 @@
 const Contact = require('../models/contact');
 const createPath = require('../helpers/create-path');
-const errorHandler = require('../helpers/error-handler');
+const { errorHandler } = require('../helpers/error-handler');
 
 const renderContactList = (req, res) => {
   const title = 'Contacts';
