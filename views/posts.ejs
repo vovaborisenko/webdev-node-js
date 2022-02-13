@@ -6,13 +6,13 @@
   <h1>Posts:</h1>
   <% if (list.length > 0) { %>
   <ul>
-    <% list.forEach(({id, title, excerpt, createdAt, author}) => { %>
+    <% list.forEach(({id, title, excerpt, content, createdAt, author}) => { %>
       <li>
         <article class="js-post" data-id="<%= id %>" data-title="<%= title %>">
           <h2>
             <a href="/posts/<%= id %>"><%= title %></a>
           </h2>
-          <p><%= excerpt || content.replace(/<.+?>/, '').slice(0, 200) %></p>
+          <p><%= excerpt || content.replace(/<.+?>/g, '').slice(0, 200) %></p>
           <div class="info">
             <span><%= createdAt.toLocaleDateString('ru') %></span>
             <span><%= author %></span>
